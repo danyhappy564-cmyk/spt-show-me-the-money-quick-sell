@@ -1,8 +1,5 @@
 ___
-> **A quick update regarding SPT 4.1:**
-> As some of you might have noticed, the Forge will be shutting down soon. You can find the Discord message explaining the reasons here: https://discord.com/channels/875684761291599922/875706629260197908/1533159965597110352
-> 
-> Due to this announcement, I have decided to put the SPT 4.1 update for this mod on hold for now. I apologize for the disappointment. My time for modding is quite limited as it is, and considering the uncertain future of the project right now, I think it makes the most sense to step back.
+> This build targets **SPT 4.1.2** (compatible with the 4.1.x line). It is not compatible with SPT 4.0.x.
 ___
 
 #### What does it do?
@@ -17,11 +14,11 @@ By default, the universe is arranged thus:
 
 All relevant configuration settings from the venerable **Show Me The Money** mod are automatically applied, as if by an invisible accountant lurking in the background.
 
-If you’re using [UIFixes](https://forge.sp-tarkov.com/mod/1342/ui-fixes) v5.0.2 or later (Tyfon’s delightful gift to humanity), you can even select **multiple items** and sell them all at once. When selling on the flea market, items of the same type are automatically bundled. Like socks in a dryer, except these actually stay together.
+If you’re using [UIFixes](https://sp-mod.com/mod/1342/ui-fixes) v5.0.2 or later (Tyfon’s delightful gift to humanity), you can even select **multiple items** and sell them all at once. When selling on the flea market, items of the same type are automatically bundled. Like socks in a dryer, except these actually stay together.
 
 #### Requirements
 
-- You must possess the mighty **[Show Me The Money](https://forge.sp-tarkov.com/mod/2299/show-me-the-money)** SPT-mod, version **2.2.0 or newer**, without which this quick-sell addon would spend its days staring listlessly into the void.
+- You must possess the mighty **[Show Me The Money](https://sp-mod.com/mod/2299/show-me-the-money)** SPT-mod, version **2.2.0 or newer**, without which this quick-sell addon would spend its days staring listlessly into the void.
 
 #### SPT 4.x Installation 
 
@@ -57,7 +54,7 @@ Adjust all settings through the BepInEx configurator (summonable through **F12**
 
 #### Known compatibility
 
-- [UIFixes](https://forge.sp-tarkov.com/mod/1342/ui-fixes) v5.0.2 or later for SPT 4.0.x by Tyfon  
+- [UIFixes](https://sp-mod.com/mod/1342/ui-fixes) v6.0.0 or later for SPT 4.1.x by Tyfon  
 
 ---
 

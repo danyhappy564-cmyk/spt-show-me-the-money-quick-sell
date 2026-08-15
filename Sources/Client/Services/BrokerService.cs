@@ -2,9 +2,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Comfort.Common;
+using EFT;
 using EFT.InventoryLogic;
 using EFT.Trading;
 using EFT.UI;
+using EFT.UI.Ragfair;
 using SwiftXP.SPT.Common.ConfigurationManager;
 using SwiftXP.SPT.Common.Constants;
 using SwiftXP.SPT.Common.Notifications;
@@ -27,7 +29,7 @@ public static class BrokerService
         {
             if (!SptSession.Session.RagFair.Available && (brokerTradeType == BrokerTradeType.Flea || brokerTradeType == BrokerTradeType.Best))
                 EftNotificationHelper.SendLongAlert("ragfair/Unlocked at character LVL {0}".Localized(null).Replace("{0}",
-                    RagFairClass.Settings.minUserLevel.ToString(CultureInfo.InvariantCulture)));
+                    RagFair.Settings.minUserLevel.ToString(CultureInfo.InvariantCulture)));
 
             List<TradeItem> tradeItems = GetTradeItems(brokerTradeType, items);
 
@@ -102,7 +104,7 @@ public static class BrokerService
         foreach (TradeItem tradeItem in tradeItems.OrderByDescending(x => x.FleaPrice?.SingleObjectPrice ?? int.MinValue))
         {
             if (tradeItem.Item.CanSellOnRagfair && tradeItem.FleaPrice != null
-                && (!RagFairClass.Settings.isOnlyFoundInRaidAllowed || (RagFairClass.Settings.isOnlyFoundInRaidAllowed && tradeItem.Item.MarkedAsSpawnedInSession))
+                && (!RagFair.Settings.isOnlyFoundInRaidAllowed || (RagFair.Settings.isOnlyFoundInRaidAllowed && tradeItem.Item.MarkedAsSpawnedInSession))
                 && (tradeItem.TraderPrice is null || tradeItem.FleaPrice.GetComparePriceInRouble() > tradeItem.TraderPrice.GetComparePriceInRouble()))
             {
                 if (result.Any(x => x.ItemTemplateId == tradeItem.Item.TemplateId))
@@ -134,7 +136,7 @@ public static class BrokerService
             if (tradeItem.TraderPrice != null
                 && (tradeItem.FleaPrice is null
                     || tradeItem.TraderPrice.GetComparePriceInRouble() > tradeItem.FleaPrice.GetComparePriceInRouble()
-                    || (RagFairClass.Settings.isOnlyFoundInRaidAllowed && !tradeItem.Item.MarkedAsSpawnedInSession)
+                    || (RagFair.Settings.isOnlyFoundInRaidAllowed && !tradeItem.Item.MarkedAsSpawnedInSession)
                     || Data.PluginContextDataHolder.Current.Configuration!.SellToTraderIfFleaSlotsFull.IsEnabled()))
             {
                 if (result.Any(x => x.TraderId == tradeItem.TraderPrice.TraderId))
@@ -158,12 +160,12 @@ public static class BrokerService
 
     private static void SellItemsToTrader(string traderId, TradeItem[] tradeItems)
     {
-        TraderClass traderClass = SptSession.Session.GetTrader(traderId);
+        Trader trader = ((ITradingSession)SptSession.Session).GetTrader(traderId);
 
-        int totalPrice = tradeItems.Sum(x => x.TraderPrice!.TotalPrice ?? traderClass.GetUserItemPrice(x.Item)!.Value.Amount);
+        int totalPrice = tradeItems.Sum(x => x.TraderPrice!.TotalPrice ?? trader.GetUserItemPrice(x.Item)!.Value.Amount);
         TradingItemReference[] tradingItemReferences = [.. tradeItems.Select(x => new TradingItemReference { Item = x.Item, Count = x.Item.StackObjectsCount })];
 
-        traderClass.ITraderInteractions.ConfirmSell(
+        ((ITradingSession)SptSession.Session).ConfirmSell(
             traderId,
             tradingItemReferences,
             totalPrice,
@@ -175,7 +177,7 @@ public static class BrokerService
     {
         string[] itemIds = [.. tradeItems.Select(x => x.Item.Id)];
 
-        GClass2335[] requirements = [new()
+        BarterTemplate[] requirements = [new()
         {
             count = price,
             _tpl = SptConstants.CurrencyIds.Roubles

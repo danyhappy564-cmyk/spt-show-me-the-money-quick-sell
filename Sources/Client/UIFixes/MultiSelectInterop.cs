@@ -142,7 +142,7 @@ namespace UIFixesInterop
         {
             if (!UIFixesLoaded.HasValue)
             {
-                bool present = Chainloader.PluginInfos.TryGetValue("Tyfon.UIFixes", out PluginInfo pluginInfo);
+                bool present = Chainloader.PluginInfos.TryGetValue("com.tyfon.uifixes", out PluginInfo pluginInfo);
                 UIFixesLoaded = present && pluginInfo.Metadata.Version >= RequiredVersion;
 
                 if (UIFixesLoaded.Value)
