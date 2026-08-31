@@ -1,0 +1,15 @@
+<Project>
+
+  <!--
+    The mod's version is not declared anywhere in the repository, so a local build produces the
+    MSBuild default of 1.0.0. That value becomes the BepInEx plugin version via
+    PluginInfoProps -> MyPluginInfo.PLUGIN_VERSION, so a self-built DLL would report itself as 1.0.0
+    to anything that depends on it.
+
+    Set to 2.3.0, the released version this source corresponds to. Overridable with -p:Version=...
+  -->
+  <PropertyGroup>
+    <Version Condition="'$(Version)' == ''">2.3.0</Version>
+  </PropertyGroup>
+
+</Project>

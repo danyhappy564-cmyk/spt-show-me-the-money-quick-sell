@@ -36,19 +36,49 @@
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.43" IncludeAssets="compile" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- <Reference Include="$(MSBuildThisFileDirectory)/../../../spt4-shared-dlls/**/*.dll" /> -->
-    <Reference Include="$(MSBuildThisFileDirectory)/../../../spt-show-me-the-money/Sources/Client/bin/Release/netstandard2.1/SwiftXP.SPT.ShowMeTheMoney.Client.dll" />
+  <!--
+    Resolve everything from an SPT install rather than from a hand-populated spt4-shared-dlls folder
+    next to the repo. That folder has to be filled in by hand, and when it is missing - which it is
+    on a fresh clone - every reference silently fails to resolve. Override the install path per build
+    with -p:SPTPath=... ; the default below only applies when nothing is passed in.
+  -->
+  <PropertyGroup>
+    <SPTPath Condition="'$(SPTPath)' == ''">E:\SPT 4.0.10</SPTPath>
+    <ShowMeTheMoneyPluginPath Condition="'$(ShowMeTheMoneyPluginPath)' == ''">$(SPTPath)\BepInEx\plugins\com.swiftxp.spt.showmethemoney</ShowMeTheMoneyPluginPath>
+    <AssemblySearchPaths>
+      $(AssemblySearchPaths);
+      $(SPTPath)\EscapeFromTarkov_Data\Managed;
+      $(SPTPath)\BepInEx\core;
+      $(SPTPath)\BepInEx\plugins\spt;
+    </AssemblySearchPaths>
+  </PropertyGroup>
 
-    <Reference Include="$(MSBuildThisFileDirectory)/../../../spt4-shared-dlls/Assembly-CSharp.dll" />
-    <Reference Include="$(MSBuildThisFileDirectory)/../../../spt4-shared-dlls/BepInEx.dll" />
-    <Reference Include="$(MSBuildThisFileDirectory)/../../../spt4-shared-dlls/Comfort.dll" />
-    <Reference Include="$(MSBuildThisFileDirectory)/../../../spt4-shared-dlls/Sirenix.Serialization.dll" />
-    <Reference Include="$(MSBuildThisFileDirectory)/../../../spt4-shared-dlls/spt-common.dll" />
-    <Reference Include="$(MSBuildThisFileDirectory)/../../../spt4-shared-dlls/spt-reflection.dll" />
-    <Reference Include="$(MSBuildThisFileDirectory)/../../../spt4-shared-dlls/UnityEngine.UI.dll" />
+  <ItemGroup>
+    <!--
+      Show Me The Money is referenced from the installed plugin rather than from a sibling clone's
+      bin folder. The old path assumed the repository sat next to this one under the exact name
+      "spt-show-me-the-money" and had been built in Release, which is not true for a clone in any
+      other folder. Build Show Me The Money first - it copies itself into the install - then build
+      this.
+    -->
+    <Reference Include="$(ShowMeTheMoneyPluginPath)\SwiftXP.SPT.ShowMeTheMoney.Client.dll" />
+
+    <Reference Include="Assembly-CSharp" />
+    <Reference Include="BepInEx" />
+    <Reference Include="Comfort" />
+    <Reference Include="Sirenix.Serialization" />
+    <Reference Include="spt-common" />
+    <Reference Include="spt-reflection" />
+    <Reference Include="UnityEngine.UI" />
   </ItemGroup>
-  
+
+  <!-- Drop the built plugin straight into the install, so no file has to be copied by hand. -->
+  <Target Name="CopyToSPT" AfterTargets="AfterBuild" Condition="Exists('$(SPTPath)')">
+    <MakeDir Directories="$(SPTPath)\BepInEx\plugins\com.swiftxp.spt.showmethemoney.quicksell" />
+    <Copy SourceFiles="$(TargetPath)"
+      DestinationFolder="$(SPTPath)\BepInEx\plugins\com.swiftxp.spt.showmethemoney.quicksell" />
+  </Target>
+
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
   </ItemGroup>
