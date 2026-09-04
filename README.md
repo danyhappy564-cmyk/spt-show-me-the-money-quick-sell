@@ -1,66 +1,58 @@
-___
-> **A quick update regarding SPT 4.1:**
-> As some of you might have noticed, the Forge will be shutting down soon. You can find the Discord message explaining the reasons here: https://discord.com/channels/875684761291599922/875706629260197908/1533159965597110352
-> 
-> Due to this announcement, I have decided to put the SPT 4.1 update for this mod on hold for now. I apologize for the disappointment. My time for modding is quite limited as it is, and considering the uncertain future of the project right now, I think it makes the most sense to step back.
-___
+# Show Me The Money: Quick Sell — 포크 변경점
 
-#### What does it do?
+원작: [swiftxp-hub/spt-show-me-the-money-quick-sell](https://github.com/swiftxp-hub/spt-show-me-the-money-quick-sell)
+(단축키 + 마우스 클릭으로 아이템을 상인/플리에 즉시 판매하는 Show Me The Money 애드온)
 
-In the grand tradition of making life marginally easier (and infinitely more entertaining), this mod allows you to **instantly sell items** from your inventory to traders or the flea market using a configurable keyboard shortcut combined with whichever mouse button you feel most emotionally connected to.  
-
-By default, the universe is arranged thus:
-
-- **Q + Left-click** → Sell to trader (the financially sensible option)  
-- **Q + Right-click** → Sell on flea market (the entrepreneurial-but-risky option)  
-- **Q + Middle-click** → Sell at *the best price*, as determined by arcane calculation and a faint whiff of magic  
-
-All relevant configuration settings from the venerable **Show Me The Money** mod are automatically applied, as if by an invisible accountant lurking in the background.
-
-If you’re using [UIFixes](https://forge.sp-tarkov.com/mod/1342/ui-fixes) v5.0.2 or later (Tyfon’s delightful gift to humanity), you can even select **multiple items** and sell them all at once. When selling on the flea market, items of the same type are automatically bundled. Like socks in a dryer, except these actually stay together.
-
-#### Requirements
-
-- You must possess the mighty **[Show Me The Money](https://forge.sp-tarkov.com/mod/2299/show-me-the-money)** SPT-mod, version **2.2.0 or newer**, without which this quick-sell addon would spend its days staring listlessly into the void.
-
-#### SPT 4.x Installation 
-
-Extract the contents of the `.zip` or `.7z` file into your SPT directory with all the elegance and grace of a caffeinated space hamster.
-
-After that, you should find exactly this file in your SPT installation:
-```
-- C:\yourSPTfolder\BepInEx\plugins\com.swiftxp.spt.showmethemoney.quicksell\SwiftXP.SPT.ShowMeTheMoney.QuickSell.Client.dll
-```
-
-#### SPT 3.11.x Installation 
-
-Extract the contents of the `.zip` or `.7z` file into your SPT directory with all the elegance and grace of a caffeinated space hamster.
-
-After that, you should find exactly this file in your SPT installation:
-```
-- C:\yourSPTfolder\BepInEx\plugins\SwiftXP.SPT.ShowMeTheMoney.QuickSell.dll
-```
-
-##### If you use the Fika headless client
-
-Splendidly simple advice: **do not install this mod there.** Nothing good will come from doing so. The client will ignore it, you’ll think it’s broken, and the universe will sigh. If you’re using [Corter’s Mod Sync](https://github.com/c-orter/ModSync), please add this mod to your `Exclusions.json`.
-
-#### Configuration
-
-Adjust all settings through the BepInEx configurator (summonable through **F12** or **F1**, assuming the stars are aligned and your keyboard cooperates):
-
-![BepInEx Plugin Configuration](https://raw.githubusercontent.com/swiftxp-hub/spt-show-me-the-money-quick-sell/refs/heads/main/Assets/plugin-configuration.png)
-
-#### Remarks
-
-- Quick-selling is currently possible **only from the inventory screen**, likely because attempting to do it mid-raid would tear a hole in the fabric of space-time (and also be wildly unbalanced).
-
-#### Known compatibility
-
-- [UIFixes](https://forge.sp-tarkov.com/mod/1342/ui-fixes) v5.0.2 or later for SPT 4.0.x by Tyfon  
+이 포크에서 손댄 내용만 기록합니다.
 
 ---
 
-##### Support and feature requests
+<26/08/31 상세 변경점>
 
-All support and requests for new features will be handled as time permits, often between cups of tea and existential reflection. Please be patient. The universe is large, confusing, and full of bugs.
+**빌드** — 새로 클론했을 때 빌드가 안 되던 원인 두 가지를 정리했습니다.
+
+- **게임 어셈블리 참조 경로 하드코딩 제거** — 참조가 레포 3단계 위의
+  `spt4-shared-dlls` 폴더를 가리키고 있었는데, 이건 수동으로 채워 넣어야 하는
+  폴더라 새 클론에서는 존재하지 않고, 없으면 모든 참조가 미해결 상태가 됩니다.
+
+  SPT 설치 폴더에서 가져오도록 변경. `SPTPath` 속성(기본값 `E:\SPT 4.0.10`,
+  `-p:SPTPath=...`로 오버라이드 가능)을 통해 참조합니다.
+
+- **Show Me The Money 본체 참조 방식 변경** — 옆에 있는 클론의 `bin` 폴더를
+  참조하고 있었습니다. 즉 이 레포 바로 옆에 정확히 `spt-show-me-the-money`라는
+  이름으로 본체 레포가 있고, 그게 Release로 빌드까지 되어 있어야 한다는 전제였는데,
+  다른 폴더 구성이면 성립하지 않습니다.
+
+  설치된 플러그인에서 가져오도록 변경했습니다. 본체를 먼저 빌드하면(본체 빌드가
+  자기 자신을 설치본으로 복사합니다) 그걸로 끝입니다.
+
+- **버전 선언 (2.3.0)** — 버전이 선언되어 있지 않아서 직접 빌드한 DLL이 자신을
+  1.0.0으로 보고했습니다. 이 소스가 대응하는 릴리스 빌드에 맞춰 2.3.0으로 명시.
+
+- 빌드된 플러그인을 설치본 plugins 폴더로 자동 복사(경로가 없으면 건너뛰므로 다른
+  환경에서도 빌드는 성공).
+
+- `Assets/icon.png` 삭제 (레포 용량 정리)
+
+---
+
+## 관련 사항 (본체 레포에서 수정)
+
+Quick Sell을 쓰다 마주칠 수 있는 문제 두 가지는 본체
+[spt-show-me-the-money](https://github.com/danyhappy564-cmyk/spt-show-me-the-money)
+포크 쪽에서 고쳤습니다. 자세한 내용은 그쪽 README 참고.
+
+- **인벤토리 클릭이 전부 먹통이 되던 문제** — 배포판 Quick Sell이 호출하는
+  `PluginContextDataHolder`가 본체 소스 트리에는 다른 이름으로 있어서, 본체를 직접
+  빌드하면 Quick Sell의 `GridItemView.OnClick` 프리픽스가 해석에 실패하고 예외가
+  원래 `OnClick`보다 먼저 빠져나갑니다. 결과적으로 아이템 검사도 컨테이너 열기도
+  안 되는데, Quick Sell을 지우면 "고쳐져서" Quick Sell 버그로 보였던 건입니다.
+  본체에서 옛 이름을 포워딩하도록 수정했습니다.
+
+- **본체 버전 미선언으로 Quick Sell이 로드를 거부하던 문제** —
+  `missing dependencies: com.swiftxp.spt.showmethemoney (v2.6.0 or newer)`.
+  본체가 버전을 선언하지 않아 1.0.0으로 보고되던 것으로, 본체에서 2.7.0을
+  선언하도록 수정했습니다.
+
+- **플리 판매 즉시 정산**도 본체 서버 모드 쪽에 들어가 있습니다
+  (`instant-flea-sell.json`으로 조절).
