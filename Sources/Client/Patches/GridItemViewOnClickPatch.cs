@@ -82,7 +82,7 @@ public class GridItemViewOnClickPatch : ModulePatch
 
             if (!result)
             {
-                ShowMeTheMoney.Client.Data.PluginContextDataHolder.SetHoveredItem(null);
+                ShowMeTheMoney.Client.Contexts.Holders.PluginContextHolder.SetHoveredItem(null);
                 SimpleTooltipShowPatch.Instance?.Close();
             }
         }
@@ -124,7 +124,7 @@ public class GridItemViewOnClickPatch : ModulePatch
             && (!item.IsContainer || (item.IsContainer && item.IsEmpty()))
             && item.PinLockState != EItemPinLockState.Locked
             && ItemIsFirAndAllowedToBeSold(item)
-            && !(item.Owner.OwnerType != EOwnerType.Profile && item.Owner.GetType() == typeof(TraderControllerClass));
+            && item.Owner.OwnerType != EOwnerType.Trader;
     }
 
     private static bool ItemIsFirAndAllowedToBeSold(Item item)

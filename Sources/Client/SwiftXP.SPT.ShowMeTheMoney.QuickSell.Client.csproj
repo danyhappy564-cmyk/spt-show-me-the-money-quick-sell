@@ -3,6 +3,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <Version>2.4.0</Version>
 
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
@@ -30,53 +31,41 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" /> -->
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.43" IncludeAssets="compile" />
   </ItemGroup>
 
-  <!--
-    Resolve everything from an SPT install rather than from a hand-populated spt4-shared-dlls folder
-    next to the repo. That folder has to be filled in by hand, and when it is missing - which it is
-    on a fresh clone - every reference silently fails to resolve. Override the install path per build
-    with -p:SPTPath=... ; the default below only applies when nothing is passed in.
-  -->
   <PropertyGroup>
-    <SPTPath Condition="'$(SPTPath)' == ''">E:\SPT 4.0.10</SPTPath>
-    <ShowMeTheMoneyPluginPath Condition="'$(ShowMeTheMoneyPluginPath)' == ''">$(SPTPath)\BepInEx\plugins\com.swiftxp.spt.showmethemoney</ShowMeTheMoneyPluginPath>
-    <AssemblySearchPaths>
-      $(AssemblySearchPaths);
-      $(SPTPath)\EscapeFromTarkov_Data\Managed;
-      $(SPTPath)\BepInEx\core;
-      $(SPTPath)\BepInEx\plugins\spt;
-    </AssemblySearchPaths>
+    <!--
+      Show Me The Money is referenced from the INSTALLED plugin, not from a sibling clone's bin
+      folder. Upstream's path assumes this repository sits next to a clone named exactly
+      "spt-show-me-the-money" that has been built in Release, which is not true for a clone in any
+      other folder - and when it is wrong the reference silently fails to resolve. Show Me The
+      Money's own build copies itself into the install, so: build that first, then build this.
+    -->
+    <ShowMeTheMoneyPluginPath Condition="'$(ShowMeTheMoneyPluginPath)' == ''">$(SptRoot)\BepInEx\plugins\com.swiftxp.spt.showmethemoney</ShowMeTheMoneyPluginPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <!--
-      Show Me The Money is referenced from the installed plugin rather than from a sibling clone's
-      bin folder. The old path assumed the repository sat next to this one under the exact name
-      "spt-show-me-the-money" and had been built in Release, which is not true for a clone in any
-      other folder. Build Show Me The Money first - it copies itself into the install - then build
-      this.
-    -->
-    <Reference Include="$(ShowMeTheMoneyPluginPath)\SwiftXP.SPT.ShowMeTheMoney.Client.dll" />
+    <Reference Include="$(ShowMeTheMoneyPluginPath)\SwiftXP.SPT.ShowMeTheMoney.Client.dll" Private="false" />
 
-    <Reference Include="Assembly-CSharp" />
-    <Reference Include="BepInEx" />
-    <Reference Include="Comfort" />
-    <Reference Include="Sirenix.Serialization" />
-    <Reference Include="spt-common" />
-    <Reference Include="spt-reflection" />
-    <Reference Include="UnityEngine.UI" />
+    <Reference Include="$(SptBepInEx)\core\0Harmony.dll" Private="false" />
+    <Reference Include="$(SptManaged)\Assembly-CSharp.dll" Private="false" />
+    <Reference Include="$(SptBepInEx)\core\BepInEx.dll" Private="false" />
+    <Reference Include="$(SptManaged)\Comfort.dll" Private="false" />
+    <Reference Include="$(SptManaged)\Sirenix.Serialization.dll" Private="false" />
+    <Reference Include="$(SptBepInEx)\plugins\spt\spt-common.dll" Private="false" />
+    <Reference Include="$(SptBepInEx)\plugins\spt\spt-reflection.dll" Private="false" />
+    <Reference Include="$(SptManaged)\UnityEngine.UI.dll" Private="false" />
+    <Reference Include="$(SptManaged)\UnityEngine.CoreModule.dll" Private="false" />
   </ItemGroup>
 
   <!-- Drop the built plugin straight into the install, so no file has to be copied by hand. -->
-  <Target Name="CopyToSPT" AfterTargets="AfterBuild" Condition="Exists('$(SPTPath)')">
-    <MakeDir Directories="$(SPTPath)\BepInEx\plugins\com.swiftxp.spt.showmethemoney.quicksell" />
+  <Target Name="CopyToSPT" AfterTargets="AfterBuild" Condition="Exists('$(SptRoot)')">
+    <MakeDir Directories="$(SptRoot)\BepInEx\plugins\com.swiftxp.spt.showmethemoney.quicksell" />
     <Copy SourceFiles="$(TargetPath)"
-      DestinationFolder="$(SPTPath)\BepInEx\plugins\com.swiftxp.spt.showmethemoney.quicksell" />
+      DestinationFolder="$(SptRoot)\BepInEx\plugins\com.swiftxp.spt.showmethemoney.quicksell" />
   </Target>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">

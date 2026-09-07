@@ -1,15 +1,30 @@
 <Project>
 
+  <Import Project="$(MSBuildThisFileDirectory)Directory.Build.props.user"
+          Condition="Exists('$(MSBuildThisFileDirectory)Directory.Build.props.user')" />
+
   <!--
-    The mod's version is not declared anywhere in the repository, so a local build produces the
-    MSBuild default of 1.0.0. That value becomes the BepInEx plugin version via
-    PluginInfoProps -> MyPluginInfo.PLUGIN_VERSION, so a self-built DLL would report itself as 1.0.0
-    to anything that depends on it.
+    The mod's version is not declared anywhere upstream, so a local build produces the MSBuild
+    default of 1.0.0. That value becomes the BepInEx plugin version via PluginInfoProps ->
+    MyPluginInfo.PLUGIN_VERSION, so a self-built DLL would report itself as 1.0.0 to anything that
+    depends on it.
 
     Set to 2.3.0, the released version this source corresponds to. Overridable with -p:Version=...
   -->
   <PropertyGroup>
     <Version Condition="'$(Version)' == ''">2.3.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SptRoot Condition="'$(SptRoot)' == '' and '$(SPT_ROOT)' != ''">$(SPT_ROOT)</SptRoot>
+    <!--
+      Fork default, so a clone builds without first creating Directory.Build.props.user. Last in
+      the chain, so Directory.Build.props.user, -p:SptRoot=... and $(SPT_ROOT) all still win.
+      Directory.Build.targets still validates whatever this resolves to.
+    -->
+    <SptRoot Condition="'$(SptRoot)' == ''">E:\SPT 4.1</SptRoot>
+    <SptManaged>$(SptRoot)\EscapeFromTarkov_Data\Managed</SptManaged>
+    <SptBepInEx>$(SptRoot)\BepInEx</SptBepInEx>
   </PropertyGroup>
 
 </Project>
